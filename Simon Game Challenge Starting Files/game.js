@@ -4,7 +4,20 @@ let userClickedPattern = [];
 let gameBegins = false;
 let level = 0;
 
-
+// This jQuery detecting the first keypress is better to be at the top!    
+$(document).keydown(function () { 
+    //since there is a new variable called level, if gameBegins is true then game begins!
+    if(!gameBegins) { 
+        
+        //This line is not so useful?!
+        $("#level-title").text("level " + level) 
+    
+        nextSequence();
+        //Setting gameBegins=true will return back to level 0
+        gameBegins = true;
+         }
+    
+});  
 
 
 $(".btn").click(function() {
@@ -19,22 +32,49 @@ $(".btn").click(function() {
     //as the playSound function has the (name) as the param
     playSound(userChosenColor)
     animatedPress(userChosenColor)
-    checkAnswer(userChosenColor)
-    })
-$(document).keydown(function () { 
-    if(!gameBegins)
-    //since there is a new variable called level, if gameBegins is true then game begins!
-    //if this line is gone, the level is stuck at 1
-    $("#level-title").text("level " + level) 
-
-    nextSequence();
-    //Setting gameBegins=true will return back to level 0
-    gameBegins = true;
     
-});
+    checkAnswer(userClickedPattern.length-1)
+    
+    
+
+    })
+
+    function checkAnswer(currentLevel){
+        console.log(userClickedPattern.length)
+    
+        if (gamePattern[currentLevel]===userClickedPattern[currentLevel]){
+            console.log("success!");
+
+            if(userClickedPattern.length === gamePattern.length) {
+                setTimeout(function() {
+                    nextSequence();
+                    }, 1000);
+                }
+            } else {
+                //add the name from the sounds file
+                playSound("wrong");
+
+                $("body").addClass("game-over")
+                setTimeout(function(){
+                    $("body").removeClass("game-over"), 200
+                })
+                
+                $("h1").text("Game Over! Press any key to restart!")
+                console.log("wrong ;(")
+                //reset the game when user gets it wrong!
+                startOver();
+            }
+        }
+
+       
+        
+    
+
 
 function nextSequence(){
     //the level that is zero and adds 1 everytime this function is called
+    userClickedPattern=[];
+    
     level++
 
     $("#level-title").text("Now at level " + level) 
@@ -43,10 +83,10 @@ function nextSequence(){
     console.log(randomNum)
     //the buttonColors is an array and it could be any randomNum, buttonColors[2] or [1]
     let randomChosenColor = buttonColors[randomNum];
-    console.log(randomChosenColor)
+    
     //here the gamePattern is an empty array and we push the randomChosenColor into this empty array
     gamePattern.push(randomChosenColor);
-    console.log(gamePattern);
+    console.log( "The random generated colour " + gamePattern);
     
 // Dr Yu's solution to simply use concate for Q3!
     $("#" + randomChosenColor).fadeIn(100).fadeOut(100).fadeIn(100);
@@ -90,9 +130,12 @@ function playSound (name) {
         $("#" + currentColor).removeClass("pressed"),200
     })
  }
- //checking the index of what the user has clicked
- function checkAnswer(currentLevel){
-    console.log(userClickedPattern.length)
-    
-}
+ function startOver () {
+    // reset the game and having these variables like the start
+    level = 0;
+    gameBegins = false;
+    gamePattern = [];
+
+ }
+ 
 
